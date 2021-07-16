@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+
 using namespace std;
 
 #define TOTPOSSCARDS 81
@@ -13,22 +14,30 @@ enum Shape {Oval, Diamond, Squiggle};
 enum Pattern {Empty, Lined, Full};
 
 struct Card{
+        int cardIndex;
         int num;
         Shape shape;
         Color color;
         Pattern pattern;
+        bool here = false;
 };
 
 class Set {
     public: 
 
+    void readBoard();
+
+
+
     private:
     int hashFunctionOne(const Card &card);
     int hashFunctionTwo(const Card &cardOne, const Card &cardTwo);
+    int find(int hashIndex);
 
     vector <Card> board;
-    vector <Card> index[TOTPOSSCARDS];
-    //int numCards;
+    vector <Card> index;
+    string filename;
+    int numCards;
 };
 
 /* Possible optimization Ideas:
@@ -150,4 +159,80 @@ int Set::hashFunctionTwo(const Card &cardOne, const Card &cardTwo){
     
 
     return desiredColor + desiredNum*3 + desiredShape*9 + desiredPattern*27;
+}
+
+void Set::readBoard(){
+    cout<<"Type in filename containing cards: ";
+    cin>>filename;
+    ifstream fin(filename.c_str());
+    if(!fin.is_open()){
+        cout<<"Error opening file"<<endl;
+        exit(1);
+    }
+
+    fin >> numCards;
+    board.resize(numCards);
+    index.resize(TOTPOSSCARDS);
+
+    Card currentCard;
+    for(int i = 0; i < numCards; i++){
+        fin >> currentCard.color >> currentCard.num >> currentCard.shape >> currentCard.pattern;
+        currentCard.here = true;
+        currentCard.cardIndex = i;
+        
+        board[i] = currentCard;
+        index[hashFunctionOne(currentCard)] = currentCard;
+    }
+}
+
+
+
+int Set::find(int hashIndex){
+    if(index[hashIndex].here){
+        return hashIndex;
+    }
+    return -1;
+}
+
+
+istream& operator>> (istream &is, Color &color){
+    char i;
+    is >> i;
+    if (i == 'r'){
+        color = Red;
+    }else if(i == 'g'){
+        color = Green;
+    }else{
+        color = Purple;
+    }
+
+    return is;
+}
+
+istream& operator>> (istream &is, Shape &shape){
+    char i;
+    is >> i;
+    if (i == 'o'){
+        shape = Oval;
+    }else if(i == 'd'){
+        shape = Diamond;
+    }else{
+        shape = Squiggle;
+    }
+
+    return is;
+}
+
+istream& operator>> (istream &is, Pattern &pattern){
+    char i;
+    is >> i;
+    if (i == 'o'){
+        pattern = Empty;
+    }else if(i == 'd'){
+        pattern = Lined;
+    }else{
+        pattern = Full;
+    }
+
+    return is;
 }
