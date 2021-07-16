@@ -3,16 +3,44 @@
 #include <string>
 #include <vector>
 using namespace std;
-struct card {
-    char shape;
-    int num;
-    char color;
-    char pattern;
+
+#define TOTPOSSCARDS 81
+
+enum Color {Red, Green, Purple};
+
+enum Shape {Oval, Diamond, Squiggle};
+
+enum Pattern {Empty, Lined, Full};
+
+struct Card{
+        int num;
+        Shape shape;
+        Color color;
+        Pattern pattern;
 };
+
+class Set {
+    public: 
+
+    private:
+    int hashFunctionOne(const Card &card);
+    int hashFunctionTwo(const Card &cardOne, const Card &cardTwo);
+
+    vector <Card> board;
+    vector <Card> index[TOTPOSSCARDS];
+    //int numCards;
+};
+
+/* Possible optimization Ideas:
+Use parallelism to run match searches on each card instead of running in sequence
+
+Create a hash table for the set with a hash formula such that each pair of cards 
+can be indexed to the possible location of the matching third card
+*/
 
 
 //function to check if the card features are all the same
-int checkSame(card one, card two, card three){
+/*int checkSame(Card one, Card two, Card three){
     int sum = 0; 
     if (one.shape==two.shape&&two.shape==three.shape){
         ++sum;
@@ -62,10 +90,10 @@ void solveSets (const vector<card> &board){
         }
 
     }
-}
+}*/
 
 int main(){
-    string filename;
+    /*string filename;
     cout<<"Type in filename containing cards: ";
     cin>>filename;
     ifstream fin(filename.c_str());
@@ -81,7 +109,45 @@ int main(){
         board.push_back(cards);
     }
     //solves sets
-    solveSets(board);
+    solveSets(board);*/
     return 0;
 }
 
+
+int Set::hashFunctionOne(const Card &card){
+    return card.color + card.num*3 + card.pattern*9 + card.shape*27;
+}
+
+int Set::hashFunctionTwo(const Card &cardOne, const Card &cardTwo){
+    int desiredColor = (cardOne.color + cardTwo.color)%3;
+    int desiredNum = (cardOne.num + cardTwo.num)%3;
+    int desiredShape = (cardOne.shape + cardTwo.shape)%3;
+    int desiredPattern = (cardOne.pattern + cardTwo.pattern)%3;
+
+    if(desiredColor == 1){
+        desiredColor = 2;
+    }else if(desiredColor == 2){
+        desiredColor = 1;
+    }
+
+    if(desiredNum == 1){
+        desiredNum = 2;
+    }else if(desiredNum == 2){
+        desiredNum = 1;
+    }
+
+    if(desiredShape == 1){
+        desiredShape = 2;
+    }else if(desiredShape == 2){
+        desiredShape = 1;
+    }
+
+    if(desiredPattern == 1){
+        desiredPattern = 2;
+    }else if(desiredPattern == 2){
+        desiredPattern = 1;
+    }
+    
+
+    return desiredColor + desiredNum*3 + desiredShape*9 + desiredPattern*27;
+}
