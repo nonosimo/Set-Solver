@@ -26,7 +26,18 @@ class Set {
     public: 
 
     void readBoard();
+    
+    void printBoardandIndexVec(){
+        for(int i = 0; i < board.size(); ++i){
+           fout << board[i].color << " " << board[i].num << " " 
+                << board[i].shape << " " << board[i].pattern << "\n"; 
+        }
 
+        for(int i = 0; i < index.size(); ++i){
+           fout << board[i].color << " " << board[i].num << " " 
+                << board[i].shape << " " << board[i].pattern << "\n"; 
+        }
+    }
 
 
     private:
@@ -36,6 +47,7 @@ class Set {
 
     vector <Card> board;
     vector <Card> index;
+    ofstream fout;
     string filename;
     int numCards;
 };
@@ -102,23 +114,12 @@ void solveSets (const vector<card> &board){
 }*/
 
 int main(){
-    /*string filename;
-    cout<<"Type in filename containing cards: ";
-    cin>>filename;
-    ifstream fin(filename.c_str());
-    if(!fin.is_open()){
-        cout<<"Error opening file"<<endl;
-        return 1;
-    }
+    Set set;
+    set.readBoard();
+
+    set.printBoardandIndexVec();
     
-    //read in the data from file
-    card cards;
-    vector<card> board;
-    while (fin>> cards.shape>> cards.num>>cards.color>>cards.pattern){
-        board.push_back(cards);
-    }
-    //solves sets
-    solveSets(board);*/
+
     return 0;
 }
 
@@ -161,11 +162,18 @@ int Set::hashFunctionTwo(const Card &cardOne, const Card &cardTwo){
     return desiredColor + desiredNum*3 + desiredShape*9 + desiredPattern*27;
 }
 
+
+
 void Set::readBoard(){
-    cout<<"Type in filename containing cards: ";
-    cin>>filename;
+    filename = "exBoard.txt";
     ifstream fin(filename.c_str());
     if(!fin.is_open()){
+        cout<<"Error opening file"<<endl;
+        exit(1);
+    }
+
+    fout.open("output.txt");
+    if(!fout.is_open()){
         cout<<"Error opening file"<<endl;
         exit(1);
     }
