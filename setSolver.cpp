@@ -8,13 +8,108 @@ using namespace std;
 #define TOTPOSSCARDS 81
 
 enum Color {Red, Green, Purple};
+ifstream& operator>> (ifstream &is, Color &color){
+    char i;
+    is >> i;
+    if (i == 'r'){
+        color = Red;
+    }else if(i == 'g'){
+        color = Green;
+    }else{
+        color = Purple;
+    }
+
+    return is;
+}
+
+ofstream& operator<< (ofstream &is, const Color &color){
+    char i;
+    if (color == Red){
+        i = 'r';
+    }else if(color == Green){
+        i = 'g';
+    }else{
+        i = 'p';
+    }
+    is << i;
+
+    return is;
+}
+
+
+
+
 
 enum Shape {Oval, Diamond, Squiggle};
 
+ifstream& operator>> (ifstream &is, Shape &shape){
+    char i;
+    is >> i;
+    if (i == 'o'){
+        shape = Oval;
+    }else if(i == 'd'){
+        shape = Diamond;
+    }else{
+        shape = Squiggle;
+    }
+
+    return is;
+}
+
+ofstream& operator<< (ofstream &is, const Shape &shape){
+    char i;
+    if (shape == Oval){
+        i = 'o';
+    }else if(shape == Diamond){
+        i = 'd';
+    }else{
+        i = 's';
+    }
+    is << i;
+
+    return is;
+}
+
+
+
+
+
 enum Pattern {Empty, Lined, Full};
 
+ifstream& operator>> (ifstream &is, Pattern &pattern){
+    char i;
+    is >> i;
+    if (i == 'e'){
+        pattern = Empty;
+    }else if(i == 'l'){
+        pattern = Lined;
+    }else{
+        pattern = Full;
+    }
+
+    return is;
+}
+
+ofstream& operator<< (ofstream &is, const Pattern &pattern){
+    char i;
+    if (pattern == Empty){
+        i = 'e';
+    }else if(pattern == Lined){
+        i = 'l';
+    }else{
+        i = 'f';
+    }
+    is << i;
+
+    return is;
+}
+
+
+
+
+
 struct Card{
-        int cardIndex;
+        size_t cardIndex;
         int num;
         Shape shape;
         Color color;
@@ -22,35 +117,50 @@ struct Card{
         bool here = false;
 };
 
+
+
+
+
 class Set {
     public: 
 
     void readBoard();
     
     void printBoardandIndexVec(){
-        for(int i = 0; i < board.size(); ++i){
-           fout << board[i].color << " " << board[i].num << " " 
-                << board[i].shape << " " << board[i].pattern << "\n"; 
+        fout << "Beginning of board \n \n";
+        for(size_t i = 0; i < board.size(); ++i){
+            fout << board[i].color << " ";
+            fout << board[i].num << " ";
+            fout << board[i].shape << " ";
+            fout << board[i].pattern << "\n"; 
         }
 
-        for(int i = 0; i < index.size(); ++i){
-           fout << board[i].color << " " << board[i].num << " " 
-                << board[i].shape << " " << board[i].pattern << "\n"; 
+        fout << "Beginning of Index \n  \n";
+        for(size_t i = 0; i < index.size(); ++i){
+            if(index[i].here){
+                fout << index[i].color << " ";
+                fout << index[i].num << " ";
+                fout << index[i].shape << " ";
+                fout << index[i].pattern << "\n";  
+                fout << index[i].cardIndex << " " << i << "\n";
+            }
         }
     }
 
 
     private:
-    int hashFunctionOne(const Card &card);
-    int hashFunctionTwo(const Card &cardOne, const Card &cardTwo);
-    int find(int hashIndex);
+    size_t hashFunctionOne(const Card &card);
+    size_t hashFunctionTwo(const Card &cardOne, const Card &cardTwo);
+    size_t find(size_t hashIndex);
 
     vector <Card> board;
     vector <Card> index;
     ofstream fout;
     string filename;
-    int numCards;
+    size_t numCards;
 };
+
+
 
 /* Possible optimization Ideas:
 Use parallelism to run match searches on each card instead of running in sequence
@@ -124,11 +234,11 @@ int main(){
 }
 
 
-int Set::hashFunctionOne(const Card &card){
-    return card.color + card.num*3 + card.pattern*9 + card.shape*27;
+size_t Set::hashFunctionOne(const Card &card){
+    return size_t(card.color + (card.num-1)*3 + card.pattern*9 + card.shape*27);
 }
 
-int Set::hashFunctionTwo(const Card &cardOne, const Card &cardTwo){
+size_t Set::hashFunctionTwo(const Card &cardOne, const Card &cardTwo){
     int desiredColor = (cardOne.color + cardTwo.color)%3;
     int desiredNum = (cardOne.num + cardTwo.num)%3;
     int desiredShape = (cardOne.shape + cardTwo.shape)%3;
@@ -159,7 +269,7 @@ int Set::hashFunctionTwo(const Card &cardOne, const Card &cardTwo){
     }
     
 
-    return desiredColor + desiredNum*3 + desiredShape*9 + desiredPattern*27;
+    return size_t(desiredColor + desiredNum*3 + desiredShape*9 + desiredPattern*27);
 }
 
 
@@ -183,8 +293,11 @@ void Set::readBoard(){
     index.resize(TOTPOSSCARDS);
 
     Card currentCard;
-    for(int i = 0; i < numCards; i++){
-        fin >> currentCard.color >> currentCard.num >> currentCard.shape >> currentCard.pattern;
+    for(size_t i = 0; i < numCards; i++){
+        fin >> currentCard.color; 
+        fin >> currentCard.num;
+        fin >> currentCard.shape;
+        fin >> currentCard.pattern;
         currentCard.here = true;
         currentCard.cardIndex = i;
         
@@ -195,52 +308,9 @@ void Set::readBoard(){
 
 
 
-int Set::find(int hashIndex){
+size_t Set::find(size_t hashIndex){
     if(index[hashIndex].here){
         return hashIndex;
     }
-    return -1;
-}
-
-
-istream& operator>> (istream &is, Color &color){
-    char i;
-    is >> i;
-    if (i == 'r'){
-        color = Red;
-    }else if(i == 'g'){
-        color = Green;
-    }else{
-        color = Purple;
-    }
-
-    return is;
-}
-
-istream& operator>> (istream &is, Shape &shape){
-    char i;
-    is >> i;
-    if (i == 'o'){
-        shape = Oval;
-    }else if(i == 'd'){
-        shape = Diamond;
-    }else{
-        shape = Squiggle;
-    }
-
-    return is;
-}
-
-istream& operator>> (istream &is, Pattern &pattern){
-    char i;
-    is >> i;
-    if (i == 'o'){
-        pattern = Empty;
-    }else if(i == 'd'){
-        pattern = Lined;
-    }else{
-        pattern = Full;
-    }
-
-    return is;
+    return TOTPOSSCARDS + 1;
 }

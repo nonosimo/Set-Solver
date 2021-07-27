@@ -1,0 +1,40 @@
+Beginning of board 
+ 
+g 2 s f
+p 2 o f
+r 2 s f
+g 1 s e
+p 1 s l
+r 3 s f
+g 1 d f
+r 1 s f
+p 3 s l
+p 1 d f
+g 3 o l
+p 1 d e
+Beginning of Index 
+  
+g 3 o l
+10 16
+p 2 o f
+1 23
+p 1 d e
+11 29
+g 1 d f
+6 46
+p 1 d f
+9 47
+g 1 s e
+3 55
+p 1 s l
+4 65
+p 3 s l
+8 71
+r 1 s f
+7 72
+r 2 s f
+2 75
+g 2 s f
+0 76
+r 3 s f
+5 78

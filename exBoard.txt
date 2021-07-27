@@ -1,0 +1,13 @@
+12
+g 2 s f
+p 2 o f
+r 2 s f
+g 1 s e
+p 1 s l
+r 3 s f
+g 1 d f
+r 1 s f
+p 3 s l
+p 1 d f
+g 3 o l
+p 1 d e
